@@ -1,5 +1,3 @@
-PROGRAM_COUNTER = 0x00
-
 # instructions
 LOAD_WORD = 0x01
 STORE_WORD = 0x02
@@ -7,6 +5,11 @@ ADD = 0x03
 SUB = 0x04
 HALT = 0xff
 BLANK = 0x00
+
+# registers
+PROGRAM_COUNTER = 0x00
+REG1 = 0x01
+REG2 = 0x02
 
 
 def read_word(memory, index):
@@ -63,10 +66,10 @@ def test(program, expected):
 
 if __name__ == '__main__':
     program1 = [
-        LOAD_WORD, 0x01, 0x10,
-        LOAD_WORD, 0x02, 0x12,
-        ADD, 0x01, 0x02,
-        STORE_WORD, 0x01, 0x0e,
+        LOAD_WORD, REG1, 0x10,
+        LOAD_WORD, REG2, 0x12,
+        ADD, REG1, REG2,
+        STORE_WORD, REG1, 0x0e,
         HALT,
         BLANK,
         0x00, 0x00,
@@ -74,10 +77,10 @@ if __name__ == '__main__':
         0x01, 0x00,
     ]
     expected1 = [
-        LOAD_WORD, 0x01, 0x10,
-        LOAD_WORD, 0x02, 0x12,
-        ADD, 0x01, 0x02,
-        STORE_WORD, 0x01, 0x0e,
+        LOAD_WORD, REG1, 0x10,
+        LOAD_WORD, REG2, 0x12,
+        ADD, REG1, REG2,
+        STORE_WORD, REG1, 0x0e,
         HALT,
         BLANK,
         0x02, 0x00,
@@ -88,10 +91,10 @@ if __name__ == '__main__':
     test(program1, expected1)
 
     program2 = [
-        LOAD_WORD, 0x01, 0x10,
-        LOAD_WORD, 0x02, 0x12,
-        ADD, 0x01, 0x02,
-        STORE_WORD, 0x01, 0x0e,
+        LOAD_WORD, REG1, 0x10,
+        LOAD_WORD, REG2, 0x12,
+        ADD, REG1, REG2,
+        STORE_WORD, REG1, 0x0e,
         HALT,
         BLANK,
         0x00, 0x00,
@@ -99,10 +102,10 @@ if __name__ == '__main__':
         0x01, 0x01,
     ]
     expected2 = [
-        LOAD_WORD, 0x01, 0x10,
-        LOAD_WORD, 0x02, 0x12,
-        ADD, 0x01, 0x02,
-        STORE_WORD, 0x01, 0x0e,
+        LOAD_WORD, REG1, 0x10,
+        LOAD_WORD, REG2, 0x12,
+        ADD, REG1, REG2,
+        STORE_WORD, REG1, 0x0e,
         HALT,
         BLANK,
         0x00, 0x14,
