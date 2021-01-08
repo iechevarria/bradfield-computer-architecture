@@ -5,6 +5,8 @@
 #define STORE_WORD 0x02
 #define ADD 0x03
 #define SUB 0x04
+#define BRANCH 0x05
+#define ADD_IMMEDIATE 0x06
 #define HALT 0xff
 #define BLANK 0x00
 
@@ -26,26 +28,43 @@ void write_word(int memory[], int index, int value) {
 
 
 void execute(int memory[]) {
-  int registers[3];
+  int registers[3] = {0, 0, 0};
 
   while (registers[PROGRAM_COUNTER] < 14) {
 
+    // make my life easier, get current instruction
     int pc = registers[PROGRAM_COUNTER];
     int instruction = memory[pc];
 
-    if (instruction == HALT) {
-      break;
-    } else if (instruction == LOAD_WORD) {
-      registers[memory[pc + 1]] = read_word(memory, memory[pc + 2]);
-    } else if (instruction == STORE_WORD) {
-      write_word(memory, memory[pc + 2], registers[memory[pc + 1]]);
-    } else if (instruction == ADD) {
-      registers[memory[pc + 1]] += registers[memory[pc + 2]];
-    } else if (instruction == SUB) {
-      registers[memory[pc + 1]] -= registers[memory[pc + 2]];
-    }
-
+    // typical instruction has 2 args
     registers[PROGRAM_COUNTER] += 3;
+
+    switch(instruction) {
+      case HALT:
+        return;
+      case LOAD_WORD:
+        registers[memory[pc + 1]] = read_word(memory, memory[pc + 2]);
+        break;
+      case STORE_WORD:
+        write_word(memory, memory[pc + 2], registers[memory[pc + 1]]);
+        break;
+      case ADD:
+        registers[memory[pc + 1]] += registers[memory[pc + 2]];
+        break;
+      case SUB:
+        registers[memory[pc + 1]] -= registers[memory[pc + 2]];
+        break;
+      case ADD_IMMEDIATE:
+        registers[memory[pc + 1]] += read_word(memory, pc + 2);
+        registers[PROGRAM_COUNTER] += 1;  // extra arg for ADD_IMMEDIATE
+        break;
+      case BRANCH:
+        if (registers[memory[pc + 1]] == registers[memory[pc + 2]]) {
+          registers[PROGRAM_COUNTER] = memory[pc + 3];
+        } else {
+          registers[PROGRAM_COUNTER] += 1;  // extra arg for BRANCH
+        }
+    }
   }
 }
 
@@ -132,5 +151,27 @@ int main(void) {
     0xff, 0x12,
     0x01, 0x01
   };
-  test(program2, program2);
+  test(program2, expected2);
+
+  int program3[20] = {
+    LOAD_WORD, REG1, 0x10,
+    ADD_IMMEDIATE, REG1, 0x01, 0x01,
+    STORE_WORD, REG1, 0x0e,
+    HALT,
+    BLANK, BLANK, BLANK,
+    0x00, 0x00,
+    0xff, 0x12,
+    0x00, 0x00
+  };
+  int expected3[20] = {
+    LOAD_WORD, REG1, 0x10,
+    ADD_IMMEDIATE, REG1, 0x01, 0x01,
+    STORE_WORD, REG1, 0x0e,
+    HALT,
+    BLANK, BLANK, BLANK,
+    0x00, 0x14,
+    0xff, 0x12,
+    0x00, 0x00
+  };
+  test(program3, expected3);
 }
