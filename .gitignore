@@ -1,1 +1,9 @@
+# unix
 *.out
+
+# visual studio
+.vs
+
+# windows
+*.exe
+*.obj
